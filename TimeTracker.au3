@@ -79,13 +79,13 @@ While 1
 
 	If _Timer_GetIdleTime() > $idleTimeout Then
 
-	$activeTitle = ""
+		$activeTitle = ""
 
-	UpdateCsv( '"Idle","",""' )
+		UpdateCsv( '"Idle","",""' )
 
-	While _Timer_GetIdleTime() > $idleTimeout
-		Sleep( $frequency )
-	Wend
+		While _Timer_GetIdleTime() > $idleTimeout
+			Sleep( $frequency )
+		Wend
 
 	EndIf
 
