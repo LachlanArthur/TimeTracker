@@ -63,7 +63,16 @@ Func UpdateCsv( $cells )
 	FileWrite( $csvHandle, $line & @LF )
 EndFunc
 
+Func EndLog()
+	UpdateCsv( '"Stop Log","",""' )
+	FileClose( $csvHandle )
+EndFunc
+
 LoadSettings()
+
+OnAutoItExitRegister( "EndLog" )
+
+UpdateCsv( '"Start Log","",""' )
 
 While 1
 
