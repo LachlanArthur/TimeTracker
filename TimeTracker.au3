@@ -3,18 +3,29 @@
 #include <Timers.au3>
 
 Global $activeTitle = ""
-Global $idleTimeout = 1000 * 60
-Global $frequency   = 1000 * 1
 
-Local $iniPath = "./settings.ini"
-Local $iniDefaultsCsvDir = @UserProfileDir & "\Time Log"
-If Not FileExists( $iniPath ) Then
-	IniWrite( $iniPath, "settings", "csv_dir", $iniDefaultsCsvDir )
-EndIf
-
-Global $csvDir    = IniRead( $iniPath, "settings", "csv_dir", $iniDefaultsCsvDir )
 Global $csvPath   = Null
 Global $csvHandle = Null
+
+Func LoadSettings()
+
+	Local $iniPath = "./settings.ini"
+
+	Local $iniDefaultsCsvDir      = @UserProfileDir & "\Time Log"
+	Local $iniDefaultsIdleTimeout = 1000 * 60
+	Local $iniDefaultsFrequency   = 1000 * 1
+
+	If Not FileExists( $iniPath ) Then
+		IniWrite( $iniPath, "settings", "csv_dir", $iniDefaultsCsvDir )
+		IniWrite( $iniPath, "settings", "idle_timeout", $iniDefaultsIdleTimeout )
+		IniWrite( $iniPath, "settings", "frequency", $iniDefaultsFrequency )
+	EndIf
+
+	Global $csvDir      = IniRead( $iniPath, "settings", "csv_dir", $iniDefaultsCsvDir )
+	Global $idleTimeout = IniRead( $iniPath, "settings", "idle_timeout", $iniDefaultsIdleTimeout )
+	Global $frequency   = IniRead( $iniPath, "settings", "frequency", $iniDefaultsFrequency )
+
+EndFunc
 
 Func GetFormattedTime()
 	Return StringFormat( "%s-%s-%s %s:%s:%s", @YEAR, @MON, @MDAY, @HOUR, @MIN, @SEC )
@@ -52,16 +63,14 @@ Func UpdateCsv( $cells )
 	FileWrite( $csvHandle, $line & @LF )
 EndFunc
 
+LoadSettings()
+
 While 1
 
 	Local $processPath = _WinAPI_GetProcessFileName( WinGetProcess( "[ACTIVE]" ) )
 	Local $windowTitle = WinGetTitle( "[ACTIVE]" )
 
-	Local $newTitle = StringFormat(
-		"%s,%s",
-		QuoteCsv( $processPath ),
-		QuoteCsv( $windowTitle )
-	)
+	Local $newTitle = StringFormat( "%s,%s", QuoteCsv( $processPath ), QuoteCsv( $windowTitle ) )
 
 	If $activeTitle <> $newTitle Then
 		$activeTitle = $newTitle
